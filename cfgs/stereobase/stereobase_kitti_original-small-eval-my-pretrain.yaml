@@ -1,0 +1,97 @@
+DATA_CONFIG:
+    DATA_INFOS:
+        -   DATASET: KittiDataset
+            DATA_SPLIT: {
+                TRAINING: ./filelist/KITTI12//kitti12_train194.txt,
+                EVALUATING: '',
+                TESTING: ''
+            }
+            DATA_PATH: /data1/wangyuran/DiffStereo/DiffStereo/data/KITTI12
+            RETURN_RIGHT_DISP: false
+
+        -   DATASET: KittiDataset
+            DATA_SPLIT: {
+                TRAINING: ./filelist/KITTI15//kitti15_train180.txt,
+                EVALUATING: ./filelist/KITTI15//kitti15_val20.txt,
+                TESTING: ./filelist/KITTI15//kitti15_test.txt
+            }
+            DATA_PATH: /data1/wangyuran/DiffStereo/DiffStereo/data/KITTI15
+            RETURN_RIGHT_DISP: false
+
+    DATA_TRANSFORM:
+        TRAINING:
+            - { NAME: StereoColorJitter, BRIGHTNESS: [ 0.7, 1.3 ], CONTRAST: [ 0.7, 1.3 ], SATURATION: [ 0.7, 1.3 ], HUE: 0.3, ASYMMETRIC_PROB: 0 }
+            - { NAME: RandomErase, PROB: 0.5, MAX_TIME: 2, BOUNDS: [ 50, 100 ] }
+            - { NAME: RandomSparseScale, SIZE: [ 320, 736 ], MIN_SCALE: -0.2, MAX_SCALE: 0.5, SCALE_PROB: 0.8 }
+            - { NAME: RandomCrop, SIZE: [ 320, 736 ] }
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+        EVALUATING:
+            - { NAME: RightTopPad, SIZE: [ 384, 1248 ] }
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+
+MODEL:
+    NAME: StereoBaseGRU
+    MAX_DISP: &max_disp 192
+    BACKBONE: mobilenetv2_100
+    NUM_GROUPS: 8
+    CONCAT_CHANNELS: 8
+    USE_CONCAT_VOLUME: true
+    USE_GWC_VOLUME: true
+    USE_SUB_VOLUME: false
+    USE_INTERLACED_VOLUME: false
+    HIDDEN_DIMS: [ 128, 128, 128 ]
+    N_DOWNSAMPLE: 2
+    N_GRU_LAYERS: 3
+    CORR_RADIUS: 4
+    CORR_LEVELS: 2
+    SLOW_FAST_GRU: False
+    TRAIN_ITERS: 22
+    EVAL_ITERS: 32
+    FIND_UNUSED_PARAMETERS: false
+    CKPT: -1
+    PRETRAINED_MODEL: 'output/MfSDataset/StereoBaseGRU/stereobase_my_pretrain/SB-my-pretrain/ckpt/checkpoint_epoch_5.pth'
+
+OPTIMIZATION:
+    FREEZE_BN: true
+    SYNC_BN: true
+    AMP: true
+    BATCH_SIZE_PER_GPU: 4
+    NUM_EPOCHS: 100
+
+    OPTIMIZER:
+        NAME: AdamW
+        LR: &lr 0.0002
+        WEIGHT_DECAY: 1.0e-05
+        EPS: 1.0e-08
+
+    SCHEDULER:
+        NAME: OneCycleLR
+        ON_EPOCH: False
+        MAX_LR: *lr
+        PCT_START: 0.01
+        CYCLE_MOMENTUM: False
+        ANNEAL_STRATEGY: linear
+
+    CLIP_GRAD:
+        TYPE: value
+        CLIP_VALUE: 1.0
+
+EVALUATOR:
+    BATCH_SIZE_PER_GPU: 1
+    MAX_DISP: *max_disp
+    METRIC:
+        - d1_all
+        - epe
+        - thres_1
+        - thres_2
+        - thres_3
+
+TRAINER:
+    EVAL_INTERVAL: 1
+    CKPT_SAVE_INTERVAL: 1
+    MAX_CKPT_SAVE_NUM: 30
+    LOGGER_ITER_INTERVAL: 10
+    TRAIN_VISUALIZATION: True
+    EVAL_VISUALIZATION: True

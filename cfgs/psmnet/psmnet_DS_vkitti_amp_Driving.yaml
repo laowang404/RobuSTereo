@@ -1,0 +1,125 @@
+DATA_CONFIG:
+    DATA_INFOS:
+        -   DATASET: DiffStereoDataset
+            DATA_SPLIT: {
+                TRAINING: './filelist/DiffStereo/vkitti_allinone_cloudy.txt',
+                EVALUATING: '',
+                TESTING: ''
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/DiffStereo
+        
+        -   DATASET: DiffStereoDataset
+            DATA_SPLIT: {
+                TRAINING: './filelist/DiffStereo/vkitti_allinone_foggy.txt',
+                EVALUATING: '',
+                TESTING: ''
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/DiffStereo
+
+        -   DATASET: DiffStereoDataset
+            DATA_SPLIT: {
+                TRAINING: './filelist/DiffStereo/vkitti_allinone_rainy.txt',
+                EVALUATING: '',
+                TESTING: ''
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/DiffStereo
+
+        -   DATASET: DiffStereoDataset
+            DATA_SPLIT: {
+                TRAINING: './filelist/DiffStereo/vkitti_allinone_rainy_night.txt',
+                EVALUATING: '',
+                TESTING: ''
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/DiffStereo
+
+        -   DATASET: DiffStereoDataset
+            DATA_SPLIT: {
+                TRAINING: './filelist/DiffStereo/vkitti_snowy.txt',
+                EVALUATING: '',
+                TESTING: ''
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/DiffStereo
+
+        -   DATASET: VKITTIDataset
+            DATA_SPLIT: {
+                TRAINING: './filelist/VirtualKitti2/vkitti.txt',
+                EVALUATING: '',
+                TESTING: ''
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/vkitti
+
+        -   DATASET: DrivingDataset
+            DATA_SPLIT: {
+                TRAINING: '',
+                EVALUATING: './filelist/DrivingStereo/rainy.txt',
+                TESTING: ''
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/DrivingStereo/weather
+
+    DATA_TRANSFORM:
+        TRAINING:
+            - { NAME: RandomCrop, SIZE: [ 256, 512 ], Y_JITTER: false }
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+            - { NAME: NormalizeImage, MEAN: [ 0.485, 0.456, 0.406 ], STD: [ 0.229, 0.224, 0.225 ] }
+        EVALUATING:
+            - { NAME: DivisiblePad, BY: 32 }
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+            - { NAME: NormalizeImage, MEAN: [ 0.485, 0.456, 0.406 ], STD: [ 0.229, 0.224, 0.225 ] }
+
+MODEL:
+    NAME: PSMNet
+    MAX_DISP: &max_disp 192
+    FIND_UNUSED_PARAMETERS: false
+    CKPT: -1
+    PRETRAINED_MODEL: './pretrain/PSMNet_Sceneflow.pt' # The path of checkpoint trained with the Sceneflow dataset.
+
+OPTIMIZATION:
+    BATCH_SIZE_PER_GPU: 8
+    FREEZE_BN: false
+    SYNC_BN: true
+    AMP: false
+    NUM_EPOCHS: 100
+
+    OPTIMIZER:
+        NAME: RMSprop
+        LR: 0.001
+
+    SCHEDULER:
+        NAME: MultiStepLR
+        GAMMA: 0.1
+        MILESTONES: [ 9 ]
+        ON_EPOCH: True
+        WARMUP:
+            WARM_STEPS: 500
+
+    CLIP_GRAD:
+        TYPE: norm
+        MAX_NORM: 35
+        NORM_TYPE: 2
+
+EVALUATOR:
+    BATCH_SIZE_PER_GPU: 1
+    MAX_DISP: *max_disp
+    METRIC:
+        - d1_all
+        - epe
+        - thres_1
+        - thres_2
+        - thres_3
+
+TRAINER:
+    EVAL_INTERVAL: 1
+    CKPT_SAVE_INTERVAL: 1
+    MAX_CKPT_SAVE_NUM: 30
+    LOGGER_ITER_INTERVAL: 10
+    TRAIN_VISUALIZATION: True
+    EVAL_VISUALIZATION: True

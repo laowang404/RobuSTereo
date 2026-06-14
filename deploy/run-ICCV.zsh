@@ -1,0 +1,7 @@
+CUDA_VISIBLE_DEVICES=5 python tools/eval.py --cfg_file /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/cfgs/igev/S-igev_DS_kitti_amp_Driving.yaml --eval_data_cfg_file cfgs/driving_cloudy_eval.yaml --pretrained_model /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/output/DiffStereoDataset/SelectiveIGEV/S-igev_DS_kitti_amp_Driving/Selective-DiffStereo/ckpt/checkpoint_epoch_35.pth
+
+CUDA_VISIBLE_DEVICES=5 python tools/eval.py --cfg_file /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/cfgs/igev/S-igev_DS_kitti_amp_Driving.yaml --eval_data_cfg_file cfgs/driving_foggy_eval.yaml --pretrained_model /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/output/DiffStereoDataset/SelectiveIGEV/S-igev_DS_kitti_amp_Driving/Selective-DiffStereo/ckpt/checkpoint_epoch_35.pth
+
+CUDA_VISIBLE_DEVICES=4 python tools/eval.py --cfg_file /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/cfgs/igev/S-igev_DS_kitti_amp_Driving.yaml --eval_data_cfg_file cfgs/driving_rainy_eval.yaml --pretrained_model /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/output/DiffStereoDataset/SelectiveIGEV/S-igev_DS_kitti_amp_Driving/Selective-DiffStereo/ckpt/checkpoint_epoch_35.pth
+
+CUDA_VISIBLE_DEVICES=3 python tools/eval.py --cfg_file /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/cfgs/igev/S-igev_DS_kitti_amp_Driving.yaml --eval_data_cfg_file cfgs/driving_sunny_eval.yaml --pretrained_model /data1/wangyuran/DiffStereo/DiffStereo/OpenStereo/output/DiffStereoDataset/SelectiveIGEV/S-igev_DS_kitti_amp_Driving/Selective-DiffStereo/ckpt/checkpoint_epoch_35.pth

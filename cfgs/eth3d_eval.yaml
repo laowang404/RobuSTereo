@@ -1,0 +1,34 @@
+DATA_CONFIG:
+    DATA_INFOS:
+        -   DATASET: ETH3DDataset
+            DATA_SPLIT: {
+                EVALUATING: ./filelist/ETH3D/ETH3D_train.txt,
+                TESTING: ./filelist/ETH3D/ETH3D_train.txt
+            }
+            DATA_PATH: /data/wangyuran/datasets/DepthGen/Testing_set/ETH3D
+            RETURN_RIGHT_DISP: false
+
+    DATA_TRANSFORM:
+        EVALUATING:
+            # - { NAME: DivisiblePad, BY: 32, MODE: round }
+            # - { NAME: DivisiblePad, BY: 224, MODE: round }
+            - { NAME: DivisibleResize, BY: 224}
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+
+        TESTING:
+            # - { NAME: DivisiblePad, BY: 32, MODE: round }
+            - { NAME: DivisibleResize, BY: 224}
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+
+EVALUATOR:
+    BATCH_SIZE_PER_GPU: 1
+    APPLY_OCC_MASK: true
+    MAX_DISP: 192
+    METRIC:
+        - d1_all
+        - epe
+        - thres_1
+        - thres_2
+        - thres_3

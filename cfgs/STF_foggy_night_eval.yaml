@@ -1,0 +1,30 @@
+DATA_CONFIG:
+    DATA_INFOS:
+
+        -   DATASET: DrivingDataset
+            DATA_SPLIT: {
+                EVALUATING: './filelist/SeeThroughFog/DenseFog_night_withgt.txt',
+                TESTING: './filelist/SeeThroughFog/DenseFog_night.txt'
+            }
+            RETURN_RIGHT_DISP: False
+            DATA_PATH: ../data/SeeThroughFog
+
+    DATA_TRANSFORM:
+        EVALUATING:
+            - { NAME: Resize, SIZE: [480,256] }
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+        TESTING:
+            - { NAME: DivisiblePad, BY: 32 }
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+
+EVALUATOR:
+    BATCH_SIZE_PER_GPU: 4
+    MAX_DISP: 192
+    METRIC:
+        - d1_all
+        - epe
+        - thres_1
+        - thres_2
+        - thres_3

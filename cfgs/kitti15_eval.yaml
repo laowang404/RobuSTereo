@@ -1,0 +1,31 @@
+DATA_CONFIG:
+    DATA_INFOS:
+        -   DATASET: KittiDataset
+            DATA_SPLIT: {
+                TRAINING: ./filelist/KITTI15//kitti15_train200.txt,
+                EVALUATING: ./filelist/KITTI15//kitti15_val20.txt,
+                TESTING: ./filelist/KITTI15//kitti15_test.txt
+            }
+            DATA_PATH: /data1/wangyuran/DiffStereo/DiffStereo/data/KITTI15
+            RETURN_RIGHT_DISP: false
+
+    DATA_TRANSFORM:
+        EVALUATING:
+            - { NAME: RightTopPad, SIZE: [ 384, 1248 ] }
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+        TESTING:
+            # - { NAME: DivisiblePad, BY: 32, MODE: round }
+            - { NAME: DivisibleResize, BY: 224}
+            - { NAME: TransposeImage }
+            - { NAME: ToTensor }
+
+EVALUATOR:
+    BATCH_SIZE_PER_GPU: 1
+    MAX_DISP: 192
+    METRIC:
+        - d1_all
+        - epe
+        - thres_1
+        - thres_2
+        - thres_3
